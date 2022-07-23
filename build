@@ -1,0 +1,7 @@
+#!/bin/bash
+
+git p
+sudo docker build -t page .
+sudo docker stop page-container
+sudo docker rm page-container
+sudo docker run --name page-container -d -p 4200:4200 page
