@@ -1,7 +1,12 @@
 #!/bin/bash
 
-git p
-sudo docker build -t page .
-sudo docker stop page-container
-sudo docker rm page-container
-sudo docker run --name page-container -d -p 4200:4200 page
+target=$1
+
+cd ../$target
+
+git config --global --add safe.directory /home/andreas/git/$target
+git pull --no-rebase
+docker build -t $target .
+docker stop $target-container
+docker rm $target-container
+docker run --name $target-container -d -p 4200:4200 -v /home/andreas/.config/:/root/.config/:z $target
