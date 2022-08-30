@@ -1,2 +1,2 @@
-# webhook
+# hooked
 A webhook server for GitHub
