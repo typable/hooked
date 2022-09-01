@@ -1,5 +1,7 @@
 use serde::Deserialize;
 use std::fs;
+use std::path::Path;
+use std::path::PathBuf;
 
 use crate::Error;
 use crate::Result;
@@ -24,14 +26,37 @@ pub struct Hook {
 
 impl Config {
     pub fn acquire() -> Result<Self> {
-        let mut config_path = match dirs::config_dir() {
-            Some(config_path) => config_path,
-            None => return Err(Error::new("unable to determine config path!")),
+        let mut config_file = Self::get_global();
+        let local_file = Self::get_local();
+        if local_file.is_some() {
+            config_file = local_file;
+        }
+        match config_file {
+            Some(file) => {
+                let raw = fs::read_to_string(&file)?;
+                let config: Self = toml::from_str(&raw)?;
+                Ok(config)
+            }
+            None => Err(Error::new("unable to determine config file!")),
+        }
+    }
+    fn get_local() -> Option<PathBuf> {
+        let local_file = Path::new("config.toml").to_path_buf();
+        if !local_file.exists() {
+            return None;
+        }
+        Some(local_file)
+    }
+    fn get_global() -> Option<PathBuf> {
+        let mut global_file = match dirs::config_dir() {
+            Some(file) => file,
+            None => return None,
         };
-        config_path.push(APP_NAME);
-        config_path.push("config.toml");
-        let raw = fs::read_to_string(&config_path)?;
-        let config: Self = toml::from_str(&raw)?;
-        Ok(config)
+        global_file.push(APP_NAME);
+        global_file.push("config.toml");
+        if !global_file.exists() {
+            return None;
+        }
+        Some(global_file)
     }
 }

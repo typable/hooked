@@ -4,9 +4,6 @@ target=$1
 
 cd ../$target
 
-git config --global --add safe.directory /home/andreas/git/$target
-git pull --no-rebase
-docker build -t $target .
-docker stop $target-container
-docker rm $target-container
-docker run --name $target-container -d -p 4200:4200 -v /home/andreas/.config/:/root/.config/:z $target
+sudo -u andreas git --git-dir=../$target/.git --work-tree=../$target pull origin main
+sudo docker-compose build --build-arg VERSION=$(git log --format="%h" -n 1)
+sudo docker-compose up -d

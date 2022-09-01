@@ -1,9 +1,8 @@
 use std::process::Command;
 
 use hmac::Mac;
-use tide_rustls::TlsListener;
-use webhook::data::Payload;
-use webhook::Config;
+use hooked::data::Payload;
+use hooked::Config;
 
 #[macro_use]
 extern crate log;
@@ -54,10 +53,10 @@ impl<State: Clone + Send + Sync + 'static> tide::Middleware<State> for AuthMiddl
 
 #[tokio::main]
 async fn main() {
-    webhook::init_logger();
+    hooked::init_logger();
     info!("loading config file");
     let config =
-        Config::acquire().unwrap_or_else(|err| webhook::abort("unable to load config file!", err));
+        Config::acquire().unwrap_or_else(|err| hooked::abort("unable to load config file!", err));
     let mut app = tide::with_state(config.clone());
     let auth_middleware = AuthMiddleware::new(&config.secret);
     app.with(auth_middleware);
@@ -81,19 +80,14 @@ async fn main() {
             info!("{} {}", payload.repository.id, event);
             for hook in &req.state().hooks {
                 if hook.id.eq(&payload.repository.id) && hook.event.eq(&event) {
-                    info!("start");
-                    Command::new(hook.exec.clone()).spawn().unwrap();
+                    let (command, args) = hook.exec.split_once(' ').unwrap();
+                    Command::new(command).args(args.split(' ')).spawn().unwrap();
                 }
             }
             Ok(tide::Response::new(tide::StatusCode::Ok))
         });
     info!("starting server on {}:{}", config.host, config.port);
-    app.listen(
-        TlsListener::build()
-            .addrs(format!("{}:{}", config.host, config.port))
-            .cert(config.cert_path)
-            .key(config.key_path),
-    )
-    .await
-    .unwrap_or_else(|err| webhook::abort("failed to start server!", err.into()));
+    app.listen(&format!("{}:{}", config.host, config.port))
+        .await
+        .unwrap_or_else(|err| hooked::abort("failed to start server!", err.into()));
 }

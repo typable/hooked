@@ -13,7 +13,7 @@ pub use config::Config;
 
 use error::Error;
 
-pub const APP_NAME: &str = "webhook";
+pub const APP_NAME: &str = "hooked";
 
 pub type Result<T> = std::result::Result<T, Error>;
 

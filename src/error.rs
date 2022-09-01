@@ -1,5 +1,6 @@
+use std::fmt;
 use std::fmt::Display;
-use std::{fmt, io};
+use std::io;
 
 pub struct Error {
     message: String,
