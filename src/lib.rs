@@ -1,4 +1,5 @@
 use env_logger::Builder;
+use hmac;
 use std::process;
 
 #[macro_use]
@@ -6,6 +7,7 @@ extern crate log;
 
 pub mod data;
 pub mod error;
+pub mod middleware;
 
 mod config;
 
@@ -16,6 +18,8 @@ use error::Error;
 pub const APP_NAME: &str = "hooked";
 
 pub type Result<T> = std::result::Result<T, Error>;
+
+pub type HmacSha256 = hmac::Hmac<sha2::Sha256>;
 
 pub fn init_logger() {
     Builder::new()
