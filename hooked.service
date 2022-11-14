@@ -1,0 +1,10 @@
+[Unit]
+Description=A webhook server for GitHub
+
+[Service]
+User=andreas
+WorkingDirectory=/home/andreas/git/hooked
+ExecStart=/home/andreas/git/hooked/target/release/hooked
+
+[Install]
+WantedBy=multi-user.target
