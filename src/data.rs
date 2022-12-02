@@ -2,8 +2,6 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct Payload {
-    #[serde(rename = "ref")]
-    pub branch: String,
     pub repository: Repository,
 }
 

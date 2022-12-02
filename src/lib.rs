@@ -1,5 +1,4 @@
 use env_logger::Builder;
-use hmac;
 use std::process;
 
 #[macro_use]

@@ -20,7 +20,6 @@ pub struct Config {
 #[derive(Debug, Clone, Deserialize)]
 pub struct Hook {
     pub id: String,
-    pub branch: String,
     pub event: String,
     pub exec: String,
 }

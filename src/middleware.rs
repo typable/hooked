@@ -28,7 +28,7 @@ impl<State: Clone + Send + Sync + 'static> tide::Middleware<State> for Auth {
                 return Ok(tide::Response::new(tide::StatusCode::Unauthorized));
             }
         };
-        let secret_pub = format!("{}", &header);
+        let secret_pub = header.to_string();
         let payload = req.body_string().await?;
         let mut mac = HmacSha256::new_from_slice(self.secret.as_bytes())?;
         mac.update(payload.as_bytes());
